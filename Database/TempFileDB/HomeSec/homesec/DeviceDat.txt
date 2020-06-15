@@ -1,0 +1,4 @@
+02|keypad1|03|false
+03|keypad2|03|false
+04|Front Door|02|false
+05|Front Porch|01|false
