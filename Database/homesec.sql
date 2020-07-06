@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 08, 2020 at 06:49 AM
+-- Generation Time: Jul 06, 2020 at 02:37 AM
 -- Server version: 5.7.24
 -- PHP Version: 7.4.1
 
@@ -31,8 +31,17 @@ SET time_zone = "+00:00";
 CREATE TABLE `accesskeys` (
   `codeID` int(11) NOT NULL,
   `code` varchar(12) NOT NULL,
-  `masterKey` tinyint(1) NOT NULL DEFAULT '0'
+  `masterKey` tinyint(1) NOT NULL DEFAULT '0',
+  `userID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `accesskeys`
+--
+
+INSERT INTO `accesskeys` (`codeID`, `code`, `masterKey`, `userID`) VALUES
+(1, '323415', 1, 1),
+(2, '123456', 1, 2);
 
 -- --------------------------------------------------------
 
@@ -44,8 +53,19 @@ CREATE TABLE `devicedat` (
   `DeviceID` int(11) NOT NULL,
   `deviceName` varchar(16) DEFAULT 'Default Name',
   `deviceType` varchar(16) DEFAULT NULL,
-  `isOpen` tinyint(1) NOT NULL DEFAULT '0'
+  `activated` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `devicedat`
+--
+
+INSERT INTO `devicedat` (`DeviceID`, `deviceName`, `deviceType`, `activated`) VALUES
+(1, 'keypad1', 'keypad_type', 0),
+(2, 'keypad2', 'keypad_type', 0),
+(3, 'Front Door', 'movement_type', 0),
+(4, 'Front Porch', 'motion_type', 0),
+(5, 'Alarm', 'alarm_type', 0);
 
 -- --------------------------------------------------------
 
@@ -54,9 +74,24 @@ CREATE TABLE `devicedat` (
 --
 
 CREATE TABLE `history` (
-  `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `code` varchar(12) NOT NULL
+  `historyID` int(11) NOT NULL,
+  `date` datetime NOT NULL,
+  `code` int(11) DEFAULT NULL,
+  `data` varchar(32) DEFAULT NULL,
+  `user` int(11) DEFAULT NULL,
+  `device` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `history`
+--
+
+INSERT INTO `history` (`historyID`, `date`, `code`, `data`, `user`, `device`) VALUES
+(1, '2020-07-04 13:37:55', 323415, '', 1, 1),
+(2, '2020-07-05 16:37:55', 2237, '', NULL, 2),
+(3, '2020-07-05 16:41:22', NULL, 'Sensor tripped: 3ft', NULL, 4),
+(4, '2020-07-05 19:00:23', NULL, 'Motion Sensor Tripped', NULL, 3),
+(5, '2020-07-04 13:37:55', 323415, NULL, NULL, 3);
 
 -- --------------------------------------------------------
 
@@ -69,8 +104,17 @@ CREATE TABLE `userdat` (
   `firstName` varchar(16) NOT NULL,
   `lastName` varchar(16) NOT NULL,
   `phone` varchar(12) DEFAULT NULL,
-  `address` varchar(40) DEFAULT NULL
+  `address` varchar(40) DEFAULT NULL,
+  `item` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `userdat`
+--
+
+INSERT INTO `userdat` (`UserID`, `firstName`, `lastName`, `phone`, `address`, `item`) VALUES
+(1, 'Aiden', 'Yoshioka', '6615423117', 'unknown', NULL),
+(2, 'Alec', 'Sanchez', 'unknown', 'unknown', NULL);
 
 --
 -- Indexes for dumped tables
@@ -80,13 +124,22 @@ CREATE TABLE `userdat` (
 -- Indexes for table `accesskeys`
 --
 ALTER TABLE `accesskeys`
-  ADD PRIMARY KEY (`codeID`);
+  ADD PRIMARY KEY (`codeID`),
+  ADD KEY `userID_idx` (`userID`);
 
 --
 -- Indexes for table `devicedat`
 --
 ALTER TABLE `devicedat`
   ADD PRIMARY KEY (`DeviceID`);
+
+--
+-- Indexes for table `history`
+--
+ALTER TABLE `history`
+  ADD PRIMARY KEY (`historyID`),
+  ADD KEY `user_idx` (`user`),
+  ADD KEY `device_idx` (`device`);
 
 --
 -- Indexes for table `userdat`
@@ -102,19 +155,42 @@ ALTER TABLE `userdat`
 -- AUTO_INCREMENT for table `accesskeys`
 --
 ALTER TABLE `accesskeys`
-  MODIFY `codeID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `codeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `devicedat`
 --
 ALTER TABLE `devicedat`
-  MODIFY `DeviceID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `DeviceID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `history`
+--
+ALTER TABLE `history`
+  MODIFY `historyID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `userdat`
 --
 ALTER TABLE `userdat`
-  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `accesskeys`
+--
+ALTER TABLE `accesskeys`
+  ADD CONSTRAINT `userID` FOREIGN KEY (`userID`) REFERENCES `userdat` (`UserID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `history`
+--
+ALTER TABLE `history`
+  ADD CONSTRAINT `device` FOREIGN KEY (`device`) REFERENCES `devicedat` (`DeviceID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `user` FOREIGN KEY (`user`) REFERENCES `userdat` (`UserID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
