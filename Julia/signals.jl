@@ -2,6 +2,8 @@ import JSON
 
 using Printf
 
+baseLink::AbstractString = "http://localhost:8080/HomeSec/rest/API/codeCheck/"
+
 include("sensortypes.jl")
 
 # Will actually send the signal and return the response in the future
@@ -21,8 +23,7 @@ function sendsignal(s::MovementSensor)
 end
 
 function sendsignal(s::Keypad)
-    jsonstr = JSON.json(s)
-    return sendsignal(jsonstr)
+    return baseLink + string(s.data.id) + "/" + code + "/" + string(Dates.now())
 end
 
 function detectmotion(s::MotionSensor, d_feet::Float64)
@@ -42,7 +43,7 @@ end
 
 function entercode(s::Keypad, code::AbstractString)
     s.code = code
-    println(sendsignal(s))
+    return sendsignal(s)
 end
 
 function utest()
