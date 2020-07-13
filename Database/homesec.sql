@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 06, 2020 at 02:37 AM
+-- Generation Time: Jul 13, 2020 at 06:45 AM
 -- Server version: 5.7.24
 -- PHP Version: 7.4.1
 
@@ -41,7 +41,10 @@ CREATE TABLE `accesskeys` (
 
 INSERT INTO `accesskeys` (`codeID`, `code`, `masterKey`, `userID`) VALUES
 (1, '323415', 1, 1),
-(2, '123456', 1, 2);
+(2, '123456', 1, 2),
+(3, '46123', 0, 2),
+(4, '1231251', 0, 4),
+(5, '123678', 0, 5);
 
 -- --------------------------------------------------------
 
@@ -65,7 +68,7 @@ INSERT INTO `devicedat` (`DeviceID`, `deviceName`, `deviceType`, `activated`) VA
 (2, 'keypad2', 'keypad_type', 0),
 (3, 'Front Door', 'movement_type', 0),
 (4, 'Front Porch', 'motion_type', 0),
-(5, 'Alarm', 'alarm_type', 0);
+(5, 'Alarm', 'alarm_type', 1);
 
 -- --------------------------------------------------------
 
@@ -91,7 +94,11 @@ INSERT INTO `history` (`historyID`, `date`, `code`, `data`, `user`, `device`) VA
 (2, '2020-07-05 16:37:55', 2237, '', NULL, 2),
 (3, '2020-07-05 16:41:22', NULL, 'Sensor tripped: 3ft', NULL, 4),
 (4, '2020-07-05 19:00:23', NULL, 'Motion Sensor Tripped', NULL, 3),
-(5, '2020-07-04 13:37:55', 323415, NULL, NULL, 3);
+(5, '2020-07-04 13:37:55', 323415, NULL, NULL, 3),
+(6, '2020-07-04 13:37:55', 323415, NULL, NULL, 3),
+(7, '2020-07-04 13:37:55', 323415, NULL, NULL, 3),
+(8, '2020-07-05 19:00:23', NULL, 'Motion Sensor Tripped', NULL, 3),
+(9, '2020-07-05 19:00:23', NULL, 'Motion Sensor Tripped', NULL, 3);
 
 -- --------------------------------------------------------
 
@@ -101,8 +108,8 @@ INSERT INTO `history` (`historyID`, `date`, `code`, `data`, `user`, `device`) VA
 
 CREATE TABLE `userdat` (
   `UserID` int(11) NOT NULL,
-  `firstName` varchar(16) NOT NULL,
-  `lastName` varchar(16) NOT NULL,
+  `firstName` varchar(16) NOT NULL DEFAULT 'John',
+  `lastName` varchar(16) NOT NULL DEFAULT 'Doe',
   `phone` varchar(12) DEFAULT NULL,
   `address` varchar(40) DEFAULT NULL,
   `item` varchar(45) DEFAULT NULL
@@ -114,7 +121,10 @@ CREATE TABLE `userdat` (
 
 INSERT INTO `userdat` (`UserID`, `firstName`, `lastName`, `phone`, `address`, `item`) VALUES
 (1, 'Aiden', 'Yoshioka', '6615423117', 'unknown', NULL),
-(2, 'Alec', 'Sanchez', 'unknown', 'unknown', NULL);
+(2, 'Alec', 'Sanchez', 'unknown', 'unknown', NULL),
+(3, 'Username', 'Doe', NULL, NULL, NULL),
+(4, 'TotallyHuman', 'Doe', NULL, NULL, NULL),
+(5, 'Sara', 'Doe', NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -155,7 +165,7 @@ ALTER TABLE `userdat`
 -- AUTO_INCREMENT for table `accesskeys`
 --
 ALTER TABLE `accesskeys`
-  MODIFY `codeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `codeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `devicedat`
@@ -167,13 +177,13 @@ ALTER TABLE `devicedat`
 -- AUTO_INCREMENT for table `history`
 --
 ALTER TABLE `history`
-  MODIFY `historyID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `historyID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `userdat`
 --
 ALTER TABLE `userdat`
-  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
