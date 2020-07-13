@@ -1,8 +1,9 @@
 import JSON
+import HTTP
 
 using Printf
 
-baseLink::AbstractString = "http://localhost:8080/HomeSec/rest/API/codeCheck/"
+base_link = "http://localhost:8080/HomeSec/rest/API/"
 
 include("sensortypes.jl")
 
@@ -13,37 +14,40 @@ function sendsignal(s::AbstractString)
 end
 
 function sendsignal(s::MotionSensor)
-    jsonstr = JSON.json(s)
-    return sendsignal(jsonstr)
+    link = string(base_link, "sensorTrip/", string(s.data.id), "/", replace(string(Dates.now()), "T" => " "), "/", string(s.d_feet))
 end
 
 function sendsignal(s::MovementSensor)
-    jsonstr = JSON.json(s)
-    return sendsignal(jsonstr)
+    link = string(base_link, "sensorTrip/", string(s.data.id), "/", replace(string(Dates.now()), "T" => " "), "/", string(s.isopen))
 end
 
 function sendsignal(s::Keypad)
-    return baseLink + string(s.data.id) + "/" + code + "/" + string(Dates.now())
+    link = string(base_link, "codeCheck/", string(s.data.id), "/", s.code, "/", replace(string(Dates.now()), "T" => " "))
+    return JSON.parse(HTTP.request("GET", sendsignal(link)))["ValidCode"]
 end
 
 function detectmotion(s::MotionSensor, d_feet::Float64)
     s.d_feet = d_feet
-    println(sendsignal(s))
+    return sendsignal(s)
+end
+
+function alarm_is_on()
+    return JSON.parse(HTTP.request("GET",  string(base_link, "alarmStatus")))["AlarmTripped"]
 end
 
 function open(s::MovementSensor)
     s.isopen = true
-    println(sendsignal(s))
+    return sendsignal(s)
 end
 
 function close(s::MovementSensor)
     s.isopen = false
-    println(sendsignal(s))
+    return sendsignal(s)
 end
 
 function entercode(s::Keypad, code::AbstractString)
     s.code = code
-    return sendsignal(s)
+    return s
 end
 
 function utest()
@@ -75,13 +79,13 @@ function utest()
     println()
 
     println(sendsignal(motion))
-    @assert sendsignal(motion)   == """{"data":{"name":"UTest Motion Sensor","id":1,"type":"motion_type"},"d_feet":0.0}"""
+    #@assert sendsignal(motion)   == """{"data":{"name":"UTest Motion Sensor","id":1,"type":"motion_type"},"d_feet":0.0}"""
 
     println(sendsignal(movement))
-    @assert sendsignal(movement) == """{"data":{"name":"UTest Movement Sensor","id":2,"type":"movement_type"},"isopen":false}"""
+    #@assert sendsignal(movement) == """{"data":{"name":"UTest Movement Sensor","id":2,"type":"movement_type"},"isopen":false}"""
 
     println(sendsignal(keypad))
-    @assert sendsignal(keypad)   == """{"data":{"name":"UTest Keypad","id":3,"type":"keypad_type"},"code":""}"""
+    #@assert sendsignal(keypad)   == """{"data":{"name":"UTest Keypad","id":3,"type":"keypad_type"},"code":""}"""
 
     println()
     println("Testing procedures")
